@@ -1,29 +1,40 @@
 {
-  "name": "web sockets",
+  "name": "relay-chat",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dockerup": "docker compose up -d"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.4.0",
-      "onFail": "download"
-    }
-  },
+  "description": "Horizontally scalable realtime chat with JWT auth, Socket.IO, and Redis pub/sub",
   "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "start:a": "PORT=3000 INSTANCE_ID=server-a node src/index.js",
+    "start:b": "PORT=3001 INSTANCE_ID=server-b node src/index.js",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "scale-check": "node scripts/scale-check.mjs"
+  },
+  "keywords": [
+    "websockets",
+    "socket.io",
+    "redis",
+    "jwt",
+    "chat"
+  ],
+  "author": "Sudan Khanal",
+  "license": "MIT",
   "dependencies": {
     "@socket.io/redis-adapter": "^8.3.0",
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^5.2.1",
-    "kafkajs": "^2.2.4",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^9.7.0",
     "redis": "^6.0.0",
     "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.4"
   }
 }

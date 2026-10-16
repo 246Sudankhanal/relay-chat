@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Relay</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div id="auth-view" class="auth-shell">
+      <div class="auth-card">
+        <p class="eyebrow">Realtime chat</p>
+        <h1>Relay</h1>
+        <p class="lede">
+          JWT on every request and socket handshake. Redis pub/sub so multiple
+          Node processes share one conversation.
+        </p>
+        <form id="auth-form">
+          <label>
+            Username
+            <input id="username" name="username" autocomplete="username" maxlength="20" required />
+          </label>
+          <label>
+            Password
+            <input id="password" name="password" type="password" autocomplete="current-password" required />
+          </label>
+          <p id="auth-error" class="error" hidden></p>
+          <div class="auth-actions">
+            <button type="submit" id="login-btn">Log in</button>
+            <button type="button" id="register-btn" class="ghost">Create account</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="chat-view" class="chat-shell" hidden>
+      <aside class="sidebar">
+        <div class="brand">
+          <strong>Relay</strong>
+          <span id="instance-badge" class="badge">server</span>
+        </div>
+        <p class="sidebar-label">Rooms</p>
+        <nav id="room-list" class="room-list"></nav>
+        <div class="sidebar-footer">
+          <span id="current-user"></span>
+          <button type="button" id="logout-btn" class="ghost tiny">Log out</button>
+        </div>
+      </aside>
+
+      <main class="chat-main">
+        <header class="chat-header">
+          <div>
+            <h2 id="room-name">General</h2>
+            <p id="room-desc">Say hello and hang out</p>
+          </div>
+        </header>
+        <div id="messages" class="messages"></div>
+        <form id="composer" class="composer">
+          <input id="message-input" maxlength="2000" placeholder="Message #general" autocomplete="off" />
+          <button type="submit">Send</button>
+        </form>
+      </main>
+
+      <aside class="members">
+        <p class="sidebar-label">Online</p>
+        <ul id="member-list" class="member-list"></ul>
+      </aside>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>
