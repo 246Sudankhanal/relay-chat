@@ -1,23 +1,34 @@
+import { UnauthorizedError } from '../errors/AppError.js';
 import { verifyAccessToken } from '../lib/tokens.js';
 
-export function requireAuth(req, res, next) {
-  const header = req.headers.authorization || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+function readBearer(header = '') {
+  return header.startsWith('Bearer ') ? header.slice(7) : null;
+}
 
-  if (!token) {
-    return res.status(401).json({ error: 'Missing access token' });
-  }
-
+export function requireAuth(req, _res, next) {
   try {
+    const token = readBearer(req.headers.authorization);
+    if (!token) {
+      throw new UnauthorizedError('Missing access token');
+    }
     const payload = verifyAccessToken(token);
     req.user = { id: payload.sub, username: payload.username };
-    return next();
-  } catch {
-    return res.status(401).json({ error: 'Invalid or expired access token' });
+    next();
+  } catch (err) {
+    next(err instanceof UnauthorizedError ? err : new UnauthorizedError('Invalid or expired access token'));
   }
 }
 
-export function readBearerOrHandshakeToken(value) {
-  if (!value) return null;
-  return value.startsWith('Bearer ') ? value.slice(7) : value;
+export function authenticateSocket(socket, next) {
+  try {
+    const token = socket.handshake.auth?.token;
+    if (!token) {
+      throw new UnauthorizedError();
+    }
+    const payload = verifyAccessToken(token);
+    socket.user = { id: payload.sub, username: payload.username };
+    next();
+  } catch {
+    next(new UnauthorizedError());
+  }
 }

@@ -2,23 +2,28 @@ import { io } from 'socket.io-client';
 
 const password = 'password123';
 
+async function readData(res) {
+  const payload = await res.json();
+  if (!res.ok) {
+    throw new Error(payload.error?.message || `HTTP ${res.status}`);
+  }
+  return payload.data;
+}
+
 async function auth(username) {
   const register = await fetch('http://127.0.0.1:3000/api/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
   });
-  if (register.ok) return register.json();
+  if (register.ok) return readData(register);
 
   const login = await fetch('http://127.0.0.1:3000/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
   });
-  if (!login.ok) {
-    throw new Error(`Could not auth ${username}`);
-  }
-  return login.json();
+  return readData(login);
 }
 
 function connect(url, token) {

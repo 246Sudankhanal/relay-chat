@@ -57,11 +57,11 @@ async function api(path, options = {}) {
     }
   }
 
-  const data = await res.json().catch(() => ({}));
+  const payload = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(data.error || 'Request failed');
+    throw new Error(payload.error?.message || 'Request failed');
   }
-  return data;
+  return payload.data;
 }
 
 async function refreshSession() {
@@ -163,8 +163,8 @@ function joinRoom(slug) {
   }
   renderRooms();
   socket.emit('join', slug, (response) => {
-    if (response?.error) return;
-    renderHistory(response.messages || []);
+    if (!response?.success) return;
+    renderHistory(response.data.messages || []);
   });
 }
 

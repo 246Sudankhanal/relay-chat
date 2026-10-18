@@ -1,98 +1,87 @@
 # Relay
 
-Realtime chat that still works when you run more than one Node process.
-
-This is a backend-heavy portfolio project: custom JWT auth, Socket.IO, and Redis pub/sub for horizontal scaling. Kafka is intentionally not here. Chat fan-out is ephemeral; Redis is the tool Socket.IO actually uses for multi-server broadcasts.
-
-## Why this exists
-
-A recruiter can clone it, start two servers, and watch a message sent on `:3000` appear on `:3001`. That is the whole point.
-
-- **Custom JWT** — access tokens (15m) on HTTP `Authorization` and on the Socket.IO handshake. Refresh tokens are opaque, hashed in MongoDB, stored in an httpOnly cookie, and rotated on every refresh.
-- **WebSockets** — Socket.IO for rooms, history, and presence. Username always comes from the token, never from the client payload.
-- **Redis pub/sub** — `@socket.io/redis-adapter` so every Node instance shares emits. Redis hashes also hold who is online in each room, so presence is cluster-wide too.
-- **MongoDB** — users and the last messages in a room.
+Realtime chat across multiple Node processes. Clients authenticate with JWT; Socket.IO uses Redis pub/sub so every instance shares rooms, messages, and presence.
 
 ```
-Browser ── JWT ──► Express (REST)
+Browser ── JWT ──► Express REST
 Browser ── JWT ──► Socket.IO ── Redis adapter ──► other Node processes
                          │
-                         ├── Redis (presence)
-                         └── MongoDB (users + messages)
+                         ├── Redis (online members)
+                         └── MongoDB (users, messages)
 ```
 
-## Quick start
+## Features
 
-Needs Docker (Mongo + Redis) and Node 18+.
+- Register / login with short-lived access tokens and rotating refresh tokens (httpOnly cookie, hashed in MongoDB)
+- Socket.IO handshake checks the same JWT; display names come from the token, not the client payload
+- Rooms, message history, and cluster-wide presence via Redis
+- Domain modules (`auth`, `chat`, `system`): route → controller → service → model
+- Typed `AppError`s, DTOs, and a single Express error handler
+
+## Stack
+
+Node.js, Express, Socket.IO, Redis (`@socket.io/redis-adapter`), MongoDB (Mongoose), JWT (`jsonwebtoken` + `bcryptjs`)
+
+## Setup
+
+Node 18+ and Redis + MongoDB (Docker or local).
 
 ```bash
-pnpm docker:up
 cp .env.example .env
-pnpm install --ignore-workspace
-pnpm start
+pnpm docker:up          # Mongo + Redis
+pnpm install
+pnpm start              # http://127.0.0.1:3000
 ```
 
-`--ignore-workspace` keeps packages in this folder if a parent `pnpm-workspace.yaml` exists. Docker is optional if MongoDB and Redis are already running locally.
+Create an account, join a room, send messages.
 
-Open [http://127.0.0.1:3000](http://127.0.0.1:3000), create two accounts, pick a room, send messages.
-
-### Prove it scales
-
-Two terminals, same Redis:
+### Multiple instances
 
 ```bash
-pnpm start:a   # :3000
-pnpm start:b   # :3001
+pnpm start:a            # :3000  INSTANCE_ID=server-a
+pnpm start:b            # :3001  INSTANCE_ID=server-b
+pnpm scale-check        # Alice on :3000, Bob on :3001
 ```
 
-Log in on each port. The badge in the sidebar shows `server-a` or `server-b`. Messages and online users still line up because Redis is the bus, not the process memory.
+The sidebar badge shows which process handled the socket. Messages still appear on both because Redis is the bus.
 
-```bash
-pnpm scale-check
-```
+## Auth
 
-That script logs Alice into `:3000` and Bob into `:3001`, then asserts Bob receives Alice’s message. If Redis is the adapter, it prints `ok`.
-
-## Auth flow
-
-1. Register / login returns a short-lived JWT and sets a refresh cookie.
+1. Register / login returns an access JWT and sets a refresh cookie.
 2. REST calls send `Authorization: Bearer <access>`.
-3. The socket connects with `auth: { token }`. Unauthenticated sockets are dropped in middleware.
-4. Access token expires → `POST /api/auth/refresh` rotates the cookie and returns a new JWT.
-5. Logout deletes that refresh token server-side so it cannot be reused.
+3. The socket connects with `auth: { token }`. Unauthenticated sockets are rejected.
+4. `POST /api/auth/refresh` rotates the refresh token and issues a new access JWT.
+5. Logout deletes that refresh token on the server.
 
-Access tokens stay in memory on the client, not `localStorage`. Reload recovers the session through the refresh cookie.
+The client keeps the access token in memory. A reload recovers the session through the refresh cookie.
 
 ## API
 
-| Method | Path | Auth | What it does |
+| Method | Path | Auth | Description |
 | --- | --- | --- | --- |
-| `POST` | `/api/auth/register` | no | Create user |
-| `POST` | `/api/auth/login` | no | Issue tokens |
+| `POST` | `/api/auth/register` | — | Create user |
+| `POST` | `/api/auth/login` | — | Issue tokens |
 | `POST` | `/api/auth/refresh` | cookie | Rotate refresh token |
 | `POST` | `/api/auth/logout` | cookie | Revoke refresh token |
 | `GET` | `/api/me` | JWT | Current user |
 | `GET` | `/api/rooms` | JWT | Room list |
-| `GET` | `/api/health` | no | Instance id + uptime |
+| `GET` | `/api/rooms/:slug/messages` | JWT | Recent messages |
+| `GET` | `/api/health` | — | Instance id and uptime |
 
-Socket events: `join`, `message`, `presence`, `hello`.
+Socket events: `hello`, `join`, `message`, `presence`.
 
-## Project layout
+Responses use `{ success, data }` or `{ success, error: { message, code, details } }`.
+
+## Layout
 
 ```
 src/
-  index.js            boot Mongo, Redis, HTTP, sockets
-  app.js              Express + static UI
-  config.js
-  lib/tokens.js       JWT sign/verify + refresh hashing
-  lib/redis.js
-  middleware/auth.js
-  models/             User, Message
-  routes/             auth, rooms
-  sockets/index.js    Redis adapter, JWT handshake, rooms
-  public/             login + chat UI
+  public/                 chat UI
+  modules/auth/           user model, DTOs, service, controller, routes
+  modules/chat/           messages, rooms, presence, sockets controller
+  modules/system/         health, /me
+  errors/                 AppError
+  middleware/             JWT, asyncHandler, errorHandler
+  lib/                    tokens, ApiResponse, Redis
+  sockets/                Socket.IO adapter wiring
 ```
-
-## What I would add next
-
-Rate limits, user-created rooms, and a reverse proxy in front of the Node processes. I stopped there on purpose so the scaling story stays easy to demo and explain.
