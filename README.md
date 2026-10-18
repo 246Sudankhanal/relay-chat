@@ -2,13 +2,7 @@
 
 Realtime chat across multiple Node processes. Clients authenticate with JWT; Socket.IO uses Redis pub/sub so every instance shares rooms, messages, and presence.
 
-```
-Browser ── JWT ──► Express REST
-Browser ── JWT ──► Socket.IO ── Redis adapter ──► other Node processes
-                         │
-                         ├── Redis (online members)
-                         └── MongoDB (users, messages)
-```
+![Architecture](docs/architecture.svg)
 
 ## Preview
 
