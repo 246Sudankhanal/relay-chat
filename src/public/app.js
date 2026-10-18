@@ -159,7 +159,7 @@ function joinRoom(slug) {
   if (room) {
     roomNameEl.textContent = room.name;
     roomDescEl.textContent = room.description;
-    messageInput.placeholder = `Message #${room.slug}`;
+    messageInput.placeholder = `Message ${room.name}`;
   }
   renderRooms();
   socket.emit('join', slug, (response) => {

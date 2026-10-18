@@ -1,15 +1,15 @@
 :root {
-  --bg: #0c0e14;
-  --panel: #12151d;
-  --panel-2: #181c27;
-  --line: #2a3142;
-  --text: #e8ecf5;
-  --muted: #8b95ab;
-  --accent: #7c8cff;
-  --accent-2: #5d6cf0;
-  --self: #243057;
-  --danger: #f87171;
-  --ok: #34d399;
+  --bg: #f3eee4;
+  --paper: #fffaf3;
+  --ink: #2a241c;
+  --muted: #6f675c;
+  --line: #e0d6c6;
+  --accent: #c45c26;
+  --accent-ink: #fffaf3;
+  --self: #f3d7c4;
+  --other: #ffffff;
+  --ok: #3d7a4a;
+  --danger: #b42318;
 }
 
 * {
@@ -24,14 +24,14 @@ html,
 body {
   margin: 0;
   height: 100%;
-  font-family: "Segoe UI", system-ui, sans-serif;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
   background: var(--bg);
-  color: var(--text);
+  color: var(--ink);
 }
 
 button,
 input {
-  font: inherit;
+  font-family: "Segoe UI", system-ui, sans-serif;
 }
 
 .auth-shell {
@@ -39,84 +39,71 @@ input {
   display: grid;
   place-items: center;
   padding: 24px;
-  background:
-    radial-gradient(circle at top right, rgba(124, 140, 255, 0.18), transparent 40%),
-    var(--bg);
 }
 
 .auth-card {
-  width: min(420px, 100%);
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 32px;
-}
-
-.eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.72rem;
-  color: var(--accent);
-  margin: 0 0 8px;
+  width: min(380px, 100%);
 }
 
 h1 {
-  margin: 0 0 8px;
-  font-size: 2rem;
+  margin: 0 0 6px;
+  font-size: 2.4rem;
+  font-weight: 500;
 }
 
 .lede,
 #room-desc {
   color: var(--muted);
   line-height: 1.5;
+  margin: 0 0 24px;
 }
 
 label {
   display: block;
-  margin: 16px 0;
+  margin: 14px 0;
   font-size: 0.9rem;
+  font-family: "Segoe UI", system-ui, sans-serif;
   color: var(--muted);
 }
 
 input {
   width: 100%;
   margin-top: 6px;
-  padding: 12px 14px;
-  border-radius: 10px;
+  padding: 11px 12px;
+  border-radius: 6px;
   border: 1px solid var(--line);
-  background: var(--bg);
-  color: var(--text);
+  background: var(--paper);
+  color: var(--ink);
 }
 
 input:focus {
-  outline: 2px solid rgba(124, 140, 255, 0.45);
+  outline: 2px solid rgba(196, 92, 38, 0.35);
   border-color: var(--accent);
 }
 
 .auth-actions {
   display: flex;
   gap: 10px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 button {
   background: var(--accent);
-  color: #0b1020;
+  color: var(--accent-ink);
   border: 0;
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-weight: 700;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-weight: 600;
   cursor: pointer;
 }
 
 button:hover {
-  background: var(--accent-2);
-  color: #fff;
+  filter: brightness(0.95);
 }
 
 button.ghost {
   background: transparent;
-  color: var(--text);
+  color: var(--ink);
   border: 1px solid var(--line);
 }
 
@@ -128,22 +115,25 @@ button.tiny {
 .error {
   color: var(--danger);
   font-size: 0.9rem;
+  font-family: "Segoe UI", system-ui, sans-serif;
 }
 
 .chat-shell {
   height: 100%;
   display: grid;
-  grid-template-columns: 240px 1fr 220px;
+  grid-template-columns: 220px 1fr 200px;
+  background: var(--paper);
 }
 
 .sidebar,
 .members {
-  background: var(--panel);
+  background: var(--bg);
   border-right: 1px solid var(--line);
   padding: 18px;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
 }
 
 .members {
@@ -155,22 +145,22 @@ button.tiny {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  font-family: Georgia, "Iowan Old Style", Palatino, serif;
+  font-size: 1.25rem;
 }
 
 .badge {
-  font-size: 0.72rem;
-  background: #1d2436;
-  color: var(--ok);
-  border: 1px solid #2e3a2f;
-  border-radius: 999px;
-  padding: 4px 8px;
+  font-size: 0.7rem;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 2px 6px;
 }
 
 .sidebar-label {
   font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   color: var(--muted);
   margin: 0 0 10px;
 }
@@ -178,21 +168,21 @@ button.tiny {
 .room-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .room-btn {
   text-align: left;
   background: transparent;
-  color: var(--text);
+  color: var(--ink);
   border: 0;
-  padding: 10px 12px;
+  padding: 8px 10px;
   font-weight: 600;
 }
 
 .room-btn.active,
 .room-btn:hover {
-  background: var(--panel-2);
+  background: var(--paper);
 }
 
 .sidebar-footer {
@@ -208,7 +198,6 @@ button.tiny {
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  background: var(--bg);
 }
 
 .chat-header {
@@ -218,6 +207,7 @@ button.tiny {
 
 .chat-header h2 {
   margin: 0;
+  font-weight: 500;
 }
 
 .messages {
@@ -226,33 +216,35 @@ button.tiny {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  font-family: "Segoe UI", system-ui, sans-serif;
 }
 
 .msg {
   max-width: min(70%, 560px);
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: var(--panel-2);
+  padding: 9px 12px;
+  border-radius: 14px;
+  background: var(--other);
   border: 1px solid var(--line);
 }
 
 .msg.self {
   align-self: flex-end;
   background: var(--self);
+  border-color: #e8c4aa;
 }
 
 .msg .meta {
   display: block;
-  font-size: 0.78rem;
-  color: var(--accent);
-  margin-bottom: 4px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 3px;
 }
 
 .composer {
   display: flex;
   gap: 10px;
-  padding: 16px 20px;
+  padding: 14px 20px;
   border-top: 1px solid var(--line);
 }
 
