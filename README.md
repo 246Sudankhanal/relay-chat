@@ -12,9 +12,9 @@ Browser ── JWT ──► Socket.IO ── Redis adapter ──► other Node
 
 ## Preview
 
-![Login](docs/screenshots/login.png)
+![Sign in](docs/screenshots/sign-in.png)
 
-![Chat](docs/screenshots/chat.png)
+![Chat](docs/screenshots/rooms.png)
 
 ## Features
 
