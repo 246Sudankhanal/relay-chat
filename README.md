@@ -10,6 +10,12 @@ Browser ── JWT ──► Socket.IO ── Redis adapter ──► other Node
                          └── MongoDB (users, messages)
 ```
 
+## Preview
+
+![Login](docs/screenshots/login.png)
+
+![Chat](docs/screenshots/chat.png)
+
 ## Features
 
 - Register / login with short-lived access tokens and rotating refresh tokens (httpOnly cookie, hashed in MongoDB)
